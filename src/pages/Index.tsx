@@ -1,16 +1,51 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import { useBudget } from '@/hooks/useBudget';
+import { OverviewCard } from '@/components/budget/OverviewCard';
+import { CategoryList } from '@/components/budget/CategoryList';
+import { ExpenseForm } from '@/components/budget/ExpenseForm';
+import { ExpenseList } from '@/components/budget/ExpenseList';
+import { SettingsSheet } from '@/components/budget/SettingsSheet';
 
-// IMPORTANT: Fully REPLACE this with your own code
-const PlaceholderIndex = () => {
-  // PLACEHOLDER: Replace this entire return statement with the user's app.
-  // The inline background color is intentionally not part of the design system.
+const Index = () => {
+  const b = useBudget();
+
   return (
-    <div className="flex min-h-screen items-center justify-center" style={{ backgroundColor: '#fcfbf8' }}>
-      <img data-lovable-blank-page-placeholder="REMOVE_THIS" src="/placeholder.svg" alt="Your app will live here!" />
-    </div>
+    <main className="min-h-screen pb-20">
+      <header className="sticky top-0 z-20 border-b border-border/60 bg-background/80 backdrop-blur-xl">
+        <div className="mx-auto flex max-w-2xl items-center justify-between gap-3 px-4 py-3 sm:px-6">
+          <div className="flex items-center gap-2.5">
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-primary shadow-glow">
+              <span className="font-display text-base font-bold text-primary-foreground">B</span>
+            </div>
+            <div>
+              <h1 className="font-display text-lg font-semibold leading-none">Bipay</h1>
+              <p className="text-[11px] text-muted-foreground">Bi-monthly budget</p>
+            </div>
+          </div>
+          <SettingsSheet
+            state={b.state}
+            onSalary={b.updateSalary}
+            onImport={b.replaceState}
+            onReset={b.resetState}
+          />
+        </div>
+      </header>
+
+      <div className="mx-auto max-w-2xl space-y-4 px-4 py-5 sm:space-y-6 sm:px-6 sm:py-8">
+        <OverviewCard period={b.period} overall={b.overall} currency={b.state.salary.currency} />
+        <ExpenseForm onAdd={b.addExpense} />
+        <CategoryList stats={b.categoryStats} currency={b.state.salary.currency} onBudgetChange={b.setCategoryBudget} />
+        <ExpenseList
+          expenses={b.state.expenses}
+          period={b.period}
+          currency={b.state.salary.currency}
+          onRemove={b.removeExpense}
+        />
+        <p className="pt-2 text-center text-xs text-muted-foreground">
+          Saved locally on this device · Export from settings to back up
+        </p>
+      </div>
+    </main>
   );
 };
-
-const Index = PlaceholderIndex;
 
 export default Index;
