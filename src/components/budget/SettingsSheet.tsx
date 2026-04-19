@@ -28,7 +28,7 @@ interface Props {
   onReset: () => void;
 }
 
-const CURRENCIES = ['USD', 'EUR', 'GBP', 'CAD', 'AUD', 'JPY', 'BRL', 'MXN', 'INR'];
+const CURRENCIES = ['USD', 'EUR', 'GBP', 'CAD', 'AUD', 'JPY', 'BRL', 'MXN', 'INR', 'PHP'];
 
 export function SettingsSheet({ state, onSalary, onImport, onReset }: Props) {
   const fileRef = useRef<HTMLInputElement>(null);
