@@ -1,4 +1,4 @@
-import { Expense, CATEGORY_MAP } from '@/lib/budget/types';
+import { Expense, Category, CategoryId, UNKNOWN_CATEGORY } from '@/lib/budget/types';
 import { formatMoney, expensesForPeriod } from '@/lib/budget/calculations';
 import { Period } from '@/lib/budget/period';
 import { Button } from '@/components/ui/button';
@@ -8,10 +8,11 @@ interface Props {
   expenses: Expense[];
   period: Period;
   currency: string;
+  categoryMap: Record<CategoryId, Category>;
   onRemove: (id: string) => void;
 }
 
-export function ExpenseList({ expenses, period, currency, onRemove }: Props) {
+export function ExpenseList({ expenses, period, currency, categoryMap, onRemove }: Props) {
   const visible = expensesForPeriod(expenses, period);
 
   return (
@@ -28,7 +29,7 @@ export function ExpenseList({ expenses, period, currency, onRemove }: Props) {
       ) : (
         <ul className="space-y-2">
           {visible.map((e) => {
-            const c = CATEGORY_MAP[e.category];
+            const c = categoryMap[e.category] ?? UNKNOWN_CATEGORY;
             return (
               <li
                 key={e.id}

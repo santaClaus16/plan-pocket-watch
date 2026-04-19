@@ -1,17 +1,12 @@
-export type CategoryId =
-  | 'housing'
-  | 'food'
-  | 'utilities'
-  | 'transport'
-  | 'savings'
-  | 'entertainment'
-  | 'health'
-  | 'other';
+/** Category IDs are arbitrary strings — built-ins use stable slugs, custom ones use uuids. */
+export type CategoryId = string;
 
 export interface Category {
   id: CategoryId;
   label: string;
   emoji: string;
+  /** Built-in categories cannot be deleted (only hidden via budget=0 if needed). */
+  builtin?: boolean;
 }
 
 export type ExpenseFrequency = 'recurring' | 'one-time';
@@ -30,35 +25,53 @@ export interface Expense {
 export type PaySchedule = 'twice-monthly' | 'biweekly';
 
 export interface SalarySettings {
-  /** Amount paid PER paycheck */
   amountPerPaycheck: number;
   schedule: PaySchedule;
-  /** ISO date — for biweekly: anchor pay date. For twice-monthly: ignored, use payDay1/payDay2 */
   anchorDate: string;
-  payDay1: number; // e.g. 15
-  payDay2: number; // e.g. 30
+  payDay1: number;
+  payDay2: number;
   currency: string;
 }
 
 export interface BudgetState {
   salary: SalarySettings;
   expenses: Expense[];
-  /** Per-category planned budget for a single pay period */
   budgets: Partial<Record<CategoryId, number>>;
+  /** User-defined categories on top of the built-in set. */
+  customCategories: Category[];
 }
 
-export const CATEGORIES: Category[] = [
-  { id: 'housing', label: 'Housing', emoji: '🏠' },
-  { id: 'food', label: 'Food', emoji: '🍽️' },
-  { id: 'utilities', label: 'Utilities', emoji: '💡' },
-  { id: 'transport', label: 'Transport', emoji: '🚗' },
-  { id: 'savings', label: 'Savings', emoji: '💰' },
-  { id: 'entertainment', label: 'Entertainment', emoji: '🎬' },
-  { id: 'health', label: 'Health', emoji: '🩺' },
-  { id: 'other', label: 'Other', emoji: '📦' },
+export const BUILTIN_CATEGORIES: Category[] = [
+  { id: 'housing', label: 'Housing', emoji: '🏠', builtin: true },
+  { id: 'food', label: 'Food', emoji: '🍽️', builtin: true },
+  { id: 'utilities', label: 'Utilities', emoji: '💡', builtin: true },
+  { id: 'transport', label: 'Transport', emoji: '🚗', builtin: true },
+  { id: 'savings', label: 'Savings', emoji: '💰', builtin: true },
+  { id: 'loans', label: 'Loans', emoji: '🏦', builtin: true },
+  { id: 'debt', label: 'Debt', emoji: '💳', builtin: true },
+  { id: 'subscriptions', label: 'Subscriptions', emoji: '🔁', builtin: true },
+  { id: 'entertainment', label: 'Entertainment', emoji: '🎬', builtin: true },
+  { id: 'health', label: 'Health', emoji: '🩺', builtin: true },
+  { id: 'other', label: 'Other', emoji: '📦', builtin: true },
 ];
 
-export const CATEGORY_MAP: Record<CategoryId, Category> = CATEGORIES.reduce(
-  (acc, c) => ({ ...acc, [c.id]: c }),
-  {} as Record<CategoryId, Category>,
-);
+/** Resolve full category list from state (built-ins + custom). */
+export function getAllCategories(state: Pick<BudgetState, 'customCategories'>): Category[] {
+  return [...BUILTIN_CATEGORIES, ...(state.customCategories ?? [])];
+}
+
+export function getCategoryMap(
+  state: Pick<BudgetState, 'customCategories'>,
+): Record<CategoryId, Category> {
+  return getAllCategories(state).reduce(
+    (acc, c) => ({ ...acc, [c.id]: c }),
+    {} as Record<CategoryId, Category>,
+  );
+}
+
+/** Fallback used when an expense references a deleted category. */
+export const UNKNOWN_CATEGORY: Category = {
+  id: 'unknown',
+  label: 'Unknown',
+  emoji: '❔',
+};

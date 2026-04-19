@@ -17,20 +17,34 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Settings2, Download, Upload, RotateCcw } from 'lucide-react';
-import { BudgetState, PaySchedule } from '@/lib/budget/types';
+import { BudgetState, Category, CategoryId, PaySchedule } from '@/lib/budget/types';
 import { exportState, importState } from '@/lib/budget/storage';
+import { CategoryManager } from './CategoryManager';
 import { toast } from 'sonner';
 
 interface Props {
   state: BudgetState;
+  categories: Category[];
   onSalary: (s: Partial<BudgetState['salary']>) => void;
+  onAddCategory: (label: string, emoji: string, budget?: number) => void;
+  onUpdateCategory: (id: CategoryId, patch: Partial<Pick<Category, 'label' | 'emoji'>>) => void;
+  onRemoveCategory: (id: CategoryId) => void;
   onImport: (s: BudgetState) => void;
   onReset: () => void;
 }
 
 const CURRENCIES = ['USD', 'EUR', 'GBP', 'CAD', 'AUD', 'JPY', 'BRL', 'MXN', 'INR', 'PHP'];
 
-export function SettingsSheet({ state, onSalary, onImport, onReset }: Props) {
+export function SettingsSheet({
+  state,
+  categories,
+  onSalary,
+  onAddCategory,
+  onUpdateCategory,
+  onRemoveCategory,
+  onImport,
+  onReset,
+}: Props) {
   const fileRef = useRef<HTMLInputElement>(null);
 
   const doExport = () => {
@@ -134,6 +148,13 @@ export function SettingsSheet({ state, onSalary, onImport, onReset }: Props) {
               </div>
             )}
           </div>
+
+          <CategoryManager
+            categories={categories}
+            onAdd={onAddCategory}
+            onUpdate={onUpdateCategory}
+            onRemove={onRemoveCategory}
+          />
 
           <div className="space-y-2">
             <h4 className="font-display text-sm uppercase tracking-wider text-muted-foreground">Data</h4>

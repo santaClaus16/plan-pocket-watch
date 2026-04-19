@@ -23,7 +23,11 @@ const Index = () => {
           </div>
           <SettingsSheet
             state={b.state}
+            categories={b.categories}
             onSalary={b.updateSalary}
+            onAddCategory={b.addCategory}
+            onUpdateCategory={b.updateCategory}
+            onRemoveCategory={b.removeCategory}
             onImport={b.replaceState}
             onReset={b.resetState}
           />
@@ -32,12 +36,18 @@ const Index = () => {
 
       <div className="mx-auto max-w-2xl space-y-4 px-4 py-5 sm:space-y-6 sm:px-6 sm:py-8">
         <OverviewCard period={b.period} overall={b.overall} currency={b.state.salary.currency} />
-        <ExpenseForm onAdd={b.addExpense} />
-        <CategoryList stats={b.categoryStats} currency={b.state.salary.currency} onBudgetChange={b.setCategoryBudget} />
+        <ExpenseForm categories={b.categories} onAdd={b.addExpense} />
+        <CategoryList
+          stats={b.categoryStats}
+          currency={b.state.salary.currency}
+          categoryMap={b.categoryMap}
+          onBudgetChange={b.setCategoryBudget}
+        />
         <ExpenseList
           expenses={b.state.expenses}
           period={b.period}
           currency={b.state.salary.currency}
+          categoryMap={b.categoryMap}
           onRemove={b.removeExpense}
         />
         <p className="pt-2 text-center text-xs text-muted-foreground">
