@@ -1,4 +1,4 @@
-import { BudgetState, CATEGORIES, CategoryId, Expense } from './types';
+import { BudgetState, CategoryId, Expense, getAllCategories } from './types';
 import { Period, isWithin } from './period';
 
 export function formatMoney(amount: number, currency = 'USD') {
@@ -25,13 +25,13 @@ export interface CategoryStat {
   spent: number;
   budget: number;
   remaining: number;
-  progress: number; // 0..1+
+  progress: number;
   status: 'safe' | 'warning' | 'over';
 }
 
 export function computeCategoryStats(state: BudgetState, period: Period): CategoryStat[] {
   const periodExpenses = expensesForPeriod(state.expenses, period);
-  return CATEGORIES.map((c) => {
+  return getAllCategories(state).map((c) => {
     const spent = periodExpenses
       .filter((e) => e.category === c.id)
       .reduce((s, e) => s + e.amount, 0);
@@ -50,7 +50,7 @@ export interface OverallStat {
   spent: number;
   remaining: number;
   progress: number;
-  pace: number; // expected progress based on time
+  pace: number;
   status: 'safe' | 'warning' | 'over';
 }
 

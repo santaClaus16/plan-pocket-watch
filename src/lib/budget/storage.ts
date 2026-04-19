@@ -18,10 +18,14 @@ export const defaultState: BudgetState = {
     utilities: 150,
     transport: 120,
     savings: 250,
+    loans: 200,
+    debt: 100,
+    subscriptions: 60,
     entertainment: 80,
     health: 50,
     other: 50,
   },
+  customCategories: [],
 };
 
 export function loadState(): BudgetState {
@@ -29,8 +33,15 @@ export function loadState(): BudgetState {
   try {
     const raw = localStorage.getItem(KEY);
     if (!raw) return defaultState;
-    const parsed = JSON.parse(raw) as BudgetState;
-    return { ...defaultState, ...parsed, salary: { ...defaultState.salary, ...parsed.salary } };
+    const parsed = JSON.parse(raw) as Partial<BudgetState>;
+    return {
+      ...defaultState,
+      ...parsed,
+      salary: { ...defaultState.salary, ...(parsed.salary ?? {}) },
+      budgets: { ...defaultState.budgets, ...(parsed.budgets ?? {}) },
+      customCategories: parsed.customCategories ?? [],
+      expenses: parsed.expenses ?? [],
+    };
   } catch {
     return defaultState;
   }
@@ -53,5 +64,12 @@ export function importState(json: string): BudgetState {
   if (!parsed || typeof parsed !== 'object' || !parsed.salary) {
     throw new Error('Invalid budget file');
   }
-  return { ...defaultState, ...parsed };
+  return {
+    ...defaultState,
+    ...parsed,
+    salary: { ...defaultState.salary, ...parsed.salary },
+    customCategories: parsed.customCategories ?? [],
+    expenses: parsed.expenses ?? [],
+    budgets: { ...defaultState.budgets, ...(parsed.budgets ?? {}) },
+  };
 }
