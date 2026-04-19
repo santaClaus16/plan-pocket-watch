@@ -103,7 +103,7 @@ export function ExpenseForm({ categories, onAdd }: Props) {
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              {CATEGORIES.map((c) => (
+              {categories.map((c) => (
                 <SelectItem key={c.id} value={c.id}>
                   <span className="mr-2">{c.emoji}</span>
                   {c.label}
