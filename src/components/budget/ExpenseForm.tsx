@@ -15,15 +15,16 @@ import {
   TabsTrigger,
   TabsContent,
 } from '@/components/ui/tabs';
-import { CATEGORIES, CategoryId, Expense } from '@/lib/budget/types';
+import { Category, CategoryId, Expense } from '@/lib/budget/types';
 import { Plus } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface Props {
+  categories: Category[];
   onAdd: (e: Omit<Expense, 'id' | 'createdAt'>) => void;
 }
 
-export function ExpenseForm({ onAdd }: Props) {
+export function ExpenseForm({ categories, onAdd }: Props) {
   const [name, setName] = useState('');
   const [amount, setAmount] = useState('');
   const [category, setCategory] = useState<CategoryId>('food');

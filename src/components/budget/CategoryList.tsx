@@ -1,4 +1,4 @@
-import { CATEGORY_MAP } from '@/lib/budget/types';
+import { Category, CategoryId, UNKNOWN_CATEGORY } from '@/lib/budget/types';
 import { CategoryStat, formatMoney } from '@/lib/budget/calculations';
 import { ProgressBar } from './ProgressBar';
 import {
@@ -13,10 +13,11 @@ import { Label } from '@/components/ui/label';
 interface Props {
   stats: CategoryStat[];
   currency: string;
-  onBudgetChange: (id: CategoryStat['category'], value: number) => void;
+  categoryMap: Record<CategoryId, Category>;
+  onBudgetChange: (id: CategoryId, value: number) => void;
 }
 
-export function CategoryList({ stats, currency, onBudgetChange }: Props) {
+export function CategoryList({ stats, currency, categoryMap, onBudgetChange }: Props) {
   return (
     <section className="surface-card rounded-3xl border border-border p-4 sm:p-6">
       <header className="mb-3 flex items-baseline justify-between">
@@ -25,7 +26,7 @@ export function CategoryList({ stats, currency, onBudgetChange }: Props) {
       </header>
       <Accordion type="multiple" className="space-y-2">
         {stats.map((s) => {
-          const cat = CATEGORY_MAP[s.category];
+          const cat = categoryMap[s.category] ?? UNKNOWN_CATEGORY;
           return (
             <AccordionItem
               key={s.category}
