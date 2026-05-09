@@ -85,9 +85,8 @@ export function SettingsSheet({
             <div>
               <Label className="text-xs text-muted-foreground">Per paycheck</Label>
               <Input
-                type="number"
+                type="text"
                 inputMode="decimal"
-                min={0}
                 value={state.salary.amountPerPaycheck}
                 onChange={(e) => onSalary({ amountPerPaycheck: Math.max(0, Number(e.target.value) || 0) })}
                 className="mt-1 h-11 tabular"
