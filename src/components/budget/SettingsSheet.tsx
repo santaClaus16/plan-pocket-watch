@@ -25,10 +25,12 @@ import { toast } from 'sonner';
 interface Props {
   state: BudgetState;
   categories: Category[];
+  disabledCategories: Set<CategoryId>;
   onSalary: (s: Partial<BudgetState['salary']>) => void;
   onAddCategory: (label: string, emoji: string, budget?: number) => void;
   onUpdateCategory: (id: CategoryId, patch: Partial<Pick<Category, 'label' | 'emoji'>>) => void;
   onRemoveCategory: (id: CategoryId) => void;
+  onToggleCategoryDisabled: (id: CategoryId) => void;
   onImport: (s: BudgetState) => void;
   onReset: () => void;
 }
@@ -38,10 +40,12 @@ const CURRENCIES = ['USD', 'EUR', 'GBP', 'CAD', 'AUD', 'JPY', 'BRL', 'MXN', 'INR
 export function SettingsSheet({
   state,
   categories,
+  disabledCategories,
   onSalary,
   onAddCategory,
   onUpdateCategory,
   onRemoveCategory,
+  onToggleCategoryDisabled,
   onImport,
   onReset,
 }: Props) {
@@ -182,9 +186,11 @@ export function SettingsSheet({
 
           <CategoryManager
             categories={categories}
+            disabledCategories={disabledCategories}
             onAdd={onAddCategory}
             onUpdate={onUpdateCategory}
             onRemove={onRemoveCategory}
+            onToggleDisabled={onToggleCategoryDisabled}
           />
 
           <div className="space-y-2">
