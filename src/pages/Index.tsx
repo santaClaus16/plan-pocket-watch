@@ -23,11 +23,13 @@ const Index = () => {
           </div>
           <SettingsSheet
             state={b.state}
-            categories={b.categories}
+            categories={b.allCategories}
+            disabledCategories={b.disabledCategories}
             onSalary={b.updateSalary}
             onAddCategory={b.addCategory}
             onUpdateCategory={b.updateCategory}
             onRemoveCategory={b.removeCategory}
+            onToggleCategoryDisabled={b.toggleCategoryDisabled}
             onImport={b.replaceState}
             onReset={b.resetState}
           />

@@ -39,6 +39,8 @@ export interface BudgetState {
   budgets: Partial<Record<CategoryId, number>>;
   /** User-defined categories on top of the built-in set. */
   customCategories: Category[];
+  /** Categories hidden from forms and lists; kept so they can be re-enabled. */
+  disabledCategories?: CategoryId[];
 }
 
 export const BUILTIN_CATEGORIES: Category[] = [
