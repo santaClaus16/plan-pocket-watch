@@ -5,7 +5,6 @@ import { ExpenseForm } from '@/components/budget/ExpenseForm';
 import { ExpenseList } from '@/components/budget/ExpenseList';
 import { SettingsSheet } from '@/components/budget/SettingsSheet';
 import { PaycheckList } from '@/components/budget/PaycheckList';
-import { ThemeToggle } from '@/components/ThemeToggle';
 import { CalculatorWidget } from '@/components/budget/CalculatorWidget';
 
 const Index = () => {
@@ -26,7 +25,7 @@ const Index = () => {
           </div>
           <div className="flex items-center gap-2">
             <CalculatorWidget />
-            <ThemeToggle />
+            <ExpenseForm categories={b.categories} onAdd={b.addExpense} />
             <SettingsSheet
               state={b.state}
               categories={b.allCategories}
@@ -46,7 +45,6 @@ const Index = () => {
       <div className="mx-auto max-w-2xl space-y-4 px-4 py-5 sm:space-y-6 sm:px-6 sm:py-8">
         <OverviewCard period={b.period} overall={b.overall} currency={b.state.salary.currency} />
         <PaycheckList paychecks={b.state.salary.paychecks} currency={b.state.salary.currency} />
-        <ExpenseForm categories={b.categories} onAdd={b.addExpense} />
         <CategoryList
           stats={b.categoryStats}
           currency={b.state.salary.currency}

@@ -16,11 +16,12 @@ import {
   TabsContent,
 } from '@/components/ui/tabs';
 import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from '@/components/ui/accordion';
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
 import { Category, CategoryId, Expense } from '@/lib/budget/types';
 import { Plus } from 'lucide-react';
 import { toast } from 'sonner';
@@ -36,6 +37,7 @@ export function ExpenseForm({ categories, onAdd }: Props) {
   const [category, setCategory] = useState<CategoryId>('food');
   const [frequency, setFrequency] = useState<'one-time' | 'recurring'>('one-time');
   const [date, setDate] = useState(() => new Date().toISOString().slice(0, 10));
+  const [open, setOpen] = useState(false);
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -54,17 +56,21 @@ export function ExpenseForm({ categories, onAdd }: Props) {
     setName('');
     setAmount('');
     toast.success('Expense added');
+    setOpen(false);
   };
 
   return (
-    <section className="surface-card rounded-3xl border border-border px-4 py-2 sm:px-6">
-      <Accordion type="single" collapsible className="w-full">
-        <AccordionItem value="expense-form" className="border-none">
-          <AccordionTrigger className="hover:no-underline py-4">
-            <h3 className="font-display text-lg font-semibold sm:text-xl text-left">Add expense</h3>
-          </AccordionTrigger>
-          <AccordionContent>
-            <form onSubmit={submit} className="space-y-4 pb-2">
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button variant="outline" size="icon" className="h-10 w-10 rounded-full" aria-label="Add expense">
+          <Plus className="h-5 w-5 text-primary" />
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle>Add expense</DialogTitle>
+        </DialogHeader>
+        <form onSubmit={submit} className="space-y-4 pt-4">
               <Tabs value={frequency} onValueChange={(v) => setFrequency(v as 'one-time' | 'recurring')}>
                 <TabsList className="grid w-full grid-cols-2">
                   <TabsTrigger value="one-time">One-time</TabsTrigger>
@@ -131,9 +137,7 @@ export function ExpenseForm({ categories, onAdd }: Props) {
                 <Plus className="mr-1.5 h-4 w-4" /> Add expense
               </Button>
             </form>
-          </AccordionContent>
-        </AccordionItem>
-      </Accordion>
-    </section>
+      </DialogContent>
+    </Dialog>
   );
 }

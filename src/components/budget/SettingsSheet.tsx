@@ -20,6 +20,7 @@ import { Settings2, Download, Upload, RotateCcw, Plus, Trash2 } from 'lucide-rea
 import { BudgetState, Category, CategoryId, PaySchedule, Paycheck } from '@/lib/budget/types';
 import { exportState, importState } from '@/lib/budget/storage';
 import { CategoryManager } from './CategoryManager';
+import { ThemeToggle } from '@/components/ThemeToggle';
 import { toast } from 'sonner';
 
 interface Props {
@@ -135,6 +136,14 @@ export function SettingsSheet({
         </SheetHeader>
 
         <div className="mt-6 space-y-6">
+          <div className="space-y-3">
+            <h4 className="font-display text-sm uppercase tracking-wider text-muted-foreground">Appearance</h4>
+            <div className="flex items-center justify-between">
+              <Label className="text-xs text-muted-foreground">Theme toggle</Label>
+              <ThemeToggle />
+            </div>
+          </div>
+
           <div className="space-y-3">
             <h4 className="font-display text-sm uppercase tracking-wider text-muted-foreground">Salary</h4>
             <div className="space-y-3">
