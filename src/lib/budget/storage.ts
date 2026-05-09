@@ -26,6 +26,7 @@ export const defaultState: BudgetState = {
     other: 50,
   },
   customCategories: [],
+  disabledCategories: [],
 };
 
 export function loadState(): BudgetState {
@@ -40,6 +41,7 @@ export function loadState(): BudgetState {
       salary: { ...defaultState.salary, ...(parsed.salary ?? {}) },
       budgets: { ...defaultState.budgets, ...(parsed.budgets ?? {}) },
       customCategories: parsed.customCategories ?? [],
+      disabledCategories: parsed.disabledCategories ?? [],
       expenses: parsed.expenses ?? [],
     };
   } catch {
@@ -69,6 +71,7 @@ export function importState(json: string): BudgetState {
     ...parsed,
     salary: { ...defaultState.salary, ...parsed.salary },
     customCategories: parsed.customCategories ?? [],
+    disabledCategories: parsed.disabledCategories ?? [],
     expenses: parsed.expenses ?? [],
     budgets: { ...defaultState.budgets, ...(parsed.budgets ?? {}) },
   };
