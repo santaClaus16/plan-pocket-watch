@@ -84,10 +84,8 @@ export function ExpenseForm({ categories, onAdd }: Props) {
             <Label htmlFor="exp-amt" className="text-xs text-muted-foreground">Amount</Label>
             <Input
               id="exp-amt"
-              type="number"
+              type="text"
               inputMode="decimal"
-              min="0"
-              step="0.01"
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
               placeholder="0.00"
