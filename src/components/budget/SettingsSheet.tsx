@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   Sheet,
   SheetContent,
@@ -46,6 +46,35 @@ export function SettingsSheet({
   onReset,
 }: Props) {
   const fileRef = useRef<HTMLInputElement>(null);
+  const [paycheckAmount, setPaycheckAmount] = useState(String(state.salary.amountPerPaycheck));
+  const [payDay1, setPayDay1] = useState(String(state.salary.payDay1));
+  const [payDay2, setPayDay2] = useState(String(state.salary.payDay2));
+
+  useEffect(() => setPaycheckAmount(String(state.salary.amountPerPaycheck)), [state.salary.amountPerPaycheck]);
+  useEffect(() => setPayDay1(String(state.salary.payDay1)), [state.salary.payDay1]);
+  useEffect(() => setPayDay2(String(state.salary.payDay2)), [state.salary.payDay2]);
+
+  const commitAmount = (value: string) => {
+    const amount = Number(value);
+    if (value.trim() !== '' && Number.isFinite(amount) && amount >= 0) {
+      onSalary({ amountPerPaycheck: amount });
+      return;
+    }
+    setPaycheckAmount(String(state.salary.amountPerPaycheck));
+  };
+
+  const commitPayDay = (key: 'payDay1' | 'payDay2', value: string) => {
+    const day = Number(value);
+    if (value.trim() !== '' && Number.isFinite(day)) {
+      const clampedDay = Math.min(31, Math.max(1, Math.round(day)));
+      onSalary({ [key]: clampedDay });
+      if (key === 'payDay1') setPayDay1(String(clampedDay));
+      if (key === 'payDay2') setPayDay2(String(clampedDay));
+      return;
+    }
+    if (key === 'payDay1') setPayDay1(String(state.salary.payDay1));
+    if (key === 'payDay2') setPayDay2(String(state.salary.payDay2));
+  };
 
   const doExport = () => {
     const blob = new Blob([exportState(state)], { type: 'application/json' });
@@ -86,9 +115,9 @@ export function SettingsSheet({
               <Label className="text-xs text-muted-foreground">Per paycheck</Label>
               <Input
                 type="text"
-                inputMode="decimal"
-                value={state.salary.amountPerPaycheck}
-                onChange={(e) => onSalary({ amountPerPaycheck: Math.max(0, Number(e.target.value) || 0) })}
+                value={paycheckAmount}
+                onChange={(e) => setPaycheckAmount(e.target.value)}
+                onBlur={(e) => commitAmount(e.target.value)}
                 className="mt-1 h-11 tabular"
               />
             </div>
@@ -120,9 +149,9 @@ export function SettingsSheet({
                   <Label className="text-xs text-muted-foreground">First pay day</Label>
                   <Input
                     type="text"
-                    inputMode="decimal"
-                    value={state.salary.payDay1}
-                    onChange={(e) => onSalary({ payDay1: Math.min(28, Math.max(1, Number(e.target.value) || 1)) })}
+                    value={payDay1}
+                    onChange={(e) => setPayDay1(e.target.value)}
+                    onBlur={(e) => commitPayDay('payDay1', e.target.value)}
                     className="mt-1 h-11 tabular"
                   />
                 </div>
@@ -130,9 +159,9 @@ export function SettingsSheet({
                   <Label className="text-xs text-muted-foreground">Second pay day</Label>
                   <Input
                     type="text"
-                    inputMode="decimal"
-                    value={state.salary.payDay2}
-                    onChange={(e) => onSalary({ payDay2: Math.min(28, Math.max(1, Number(e.target.value) || 1)) })}
+                    value={payDay2}
+                    onChange={(e) => setPayDay2(e.target.value)}
+                    onBlur={(e) => commitPayDay('payDay2', e.target.value)}
                     className="mt-1 h-11 tabular"
                   />
                 </div>
@@ -141,9 +170,10 @@ export function SettingsSheet({
               <div>
                 <Label className="text-xs text-muted-foreground">Anchor pay date</Label>
                 <Input
-                  type="date"
+                  type="text"
                   value={state.salary.anchorDate}
                   onChange={(e) => onSalary({ anchorDate: e.target.value })}
+                  placeholder="YYYY-MM-DD"
                   className="mt-1 h-11"
                 />
               </div>
