@@ -34,7 +34,19 @@ export function useBudget() {
   const period = useMemo(() => getCurrentPeriod(state.salary, now), [state.salary, now]);
   const categoryStats = useMemo(() => computeCategoryStats(state, period), [state, period]);
   const overall = useMemo(() => computeOverall(state, period), [state, period]);
-  const categories = useMemo(() => getAllCategories(state), [state]);
+  const allCategories = useMemo(() => getAllCategories(state), [state]);
+  const disabledSet = useMemo(
+    () => new Set(state.disabledCategories ?? []),
+    [state.disabledCategories],
+  );
+  const categories = useMemo(
+    () => allCategories.filter((c) => !disabledSet.has(c.id)),
+    [allCategories, disabledSet],
+  );
+  const visibleCategoryStats = useMemo(
+    () => categoryStats.filter((s) => !disabledSet.has(s.category)),
+    [categoryStats, disabledSet],
+  );
   const categoryMap = useMemo(() => getCategoryMap(state), [state]);
 
   const updateSalary = useCallback(
@@ -93,6 +105,15 @@ export function useBudget() {
     }));
   }, []);
 
+  const toggleCategoryDisabled = useCallback((id: CategoryId) => {
+    setState((p) => {
+      const current = new Set(p.disabledCategories ?? []);
+      if (current.has(id)) current.delete(id);
+      else current.add(id);
+      return { ...p, disabledCategories: Array.from(current) };
+    });
+  }, []);
+
   const replaceState = useCallback((s: BudgetState) => setState(s), []);
   const resetState = useCallback(() => setState(defaultState), []);
 
@@ -100,9 +121,11 @@ export function useBudget() {
     state,
     period,
     overall,
-    categoryStats,
+    categoryStats: visibleCategoryStats,
     categories,
+    allCategories,
     categoryMap,
+    disabledCategories: disabledSet,
     updateSalary,
     setCategoryBudget,
     addExpense,
@@ -110,6 +133,7 @@ export function useBudget() {
     addCategory,
     updateCategory,
     removeCategory,
+    toggleCategoryDisabled,
     replaceState,
     resetState,
   };
