@@ -1,15 +1,15 @@
 import { BudgetState, CategoryId, Expense, getAllCategories } from './types';
 import { Period, isWithin } from './period';
 
-export function formatMoney(amount: number, currency = 'USD') {
+export function formatMoney(amount: number, currency = 'PHP') {
   try {
     return new Intl.NumberFormat(undefined, {
       style: 'currency',
       currency,
-      maximumFractionDigits: amount % 1 === 0 ? 0 : 2,
+      maximumFractionDigits: amount % 1 === 0 ? 0 : 1,
     }).format(amount);
   } catch {
-    return `$${amount.toFixed(2)}`;
+    return `$${amount.toFixed(1)}`;
   }
 }
 
@@ -61,7 +61,7 @@ export function computeOverall(state: BudgetState, period: Period): OverallStat 
     (s, v) => s + (v ?? 0),
     0,
   );
-  const income = state.salary.amountPerPaycheck;
+  const income = state.salary.paychecks.reduce((sum, p) => sum + p.amount, 0);
   const remaining = budgetTotal - spent;
   const progress = budgetTotal > 0 ? spent / budgetTotal : 0;
   const pace = period.progress;

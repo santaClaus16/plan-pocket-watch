@@ -20,10 +20,12 @@ export default {
       backgroundImage: {
         'gradient-primary': 'var(--gradient-primary)',
         'gradient-surface': 'var(--gradient-surface)',
+        'gradient-mustard': 'var(--gradient-mustard)',  // ✅ New
       },
       boxShadow: {
         elegant: 'var(--shadow-elegant)',
         glow: 'var(--shadow-glow)',
+        'mustard-glow': 'var(--shadow-mustard-glow)',  // ✅ New
       },
       colors: {
         border: "hsl(var(--border))",
@@ -31,6 +33,10 @@ export default {
         ring: "hsl(var(--ring))",
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
+        mustard: {  // ✅ New mustard color
+          DEFAULT: "hsl(var(--mustard))",
+          foreground: "hsl(var(--mustard-foreground))",
+        },
         success: {
           DEFAULT: "hsl(var(--success))",
           foreground: "hsl(var(--success-foreground))",

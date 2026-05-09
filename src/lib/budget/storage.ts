@@ -4,7 +4,7 @@ const KEY = 'budget-state-v1';
 
 export const defaultState: BudgetState = {
   salary: {
-    amountPerPaycheck: 2000,
+    paychecks: [{ id: 'main', name: 'Primary Salary', amount: 2000 }],
     schedule: 'twice-monthly',
     anchorDate: new Date().toISOString().slice(0, 10),
     payDay1: 15,
@@ -34,11 +34,14 @@ export function loadState(): BudgetState {
   try {
     const raw = localStorage.getItem(KEY);
     if (!raw) return defaultState;
-    const parsed = JSON.parse(raw) as Partial<BudgetState>;
+    const parsed = JSON.parse(raw) as any;
+    const legacyAmount = parsed.salary?.amountPerPaycheck;
+    const paychecks = parsed.salary?.paychecks ?? (legacyAmount ? [{ id: 'legacy', name: 'Primary Salary', amount: legacyAmount }] : defaultState.salary.paychecks);
+
     return {
       ...defaultState,
       ...parsed,
-      salary: { ...defaultState.salary, ...(parsed.salary ?? {}) },
+      salary: { ...defaultState.salary, ...(parsed.salary ?? {}), paychecks },
       budgets: { ...defaultState.budgets, ...(parsed.budgets ?? {}) },
       customCategories: parsed.customCategories ?? [],
       disabledCategories: parsed.disabledCategories ?? [],
@@ -66,10 +69,13 @@ export function importState(json: string): BudgetState {
   if (!parsed || typeof parsed !== 'object' || !parsed.salary) {
     throw new Error('Invalid budget file');
   }
+  const legacyAmount = parsed.salary?.amountPerPaycheck;
+  const paychecks = parsed.salary?.paychecks ?? (legacyAmount ? [{ id: 'legacy', name: 'Primary Salary', amount: legacyAmount }] : defaultState.salary.paychecks);
+
   return {
     ...defaultState,
     ...parsed,
-    salary: { ...defaultState.salary, ...parsed.salary },
+    salary: { ...defaultState.salary, ...parsed.salary, paychecks },
     customCategories: parsed.customCategories ?? [],
     disabledCategories: parsed.disabledCategories ?? [],
     expenses: parsed.expenses ?? [],

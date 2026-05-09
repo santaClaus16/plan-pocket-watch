@@ -16,8 +16,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Settings2, Download, Upload, RotateCcw } from 'lucide-react';
-import { BudgetState, Category, CategoryId, PaySchedule } from '@/lib/budget/types';
+import { Settings2, Download, Upload, RotateCcw, Plus, Trash2 } from 'lucide-react';
+import { BudgetState, Category, CategoryId, PaySchedule, Paycheck } from '@/lib/budget/types';
 import { exportState, importState } from '@/lib/budget/storage';
 import { CategoryManager } from './CategoryManager';
 import { toast } from 'sonner';
@@ -35,7 +35,8 @@ interface Props {
   onReset: () => void;
 }
 
-const CURRENCIES = ['USD', 'EUR', 'GBP', 'CAD', 'AUD', 'JPY', 'BRL', 'MXN', 'INR', 'PHP'];
+// const CURRENCIES = ['USD', 'EUR', 'GBP', 'CAD', 'AUD', 'JPY', 'BRL', 'MXN', 'INR', 'PHP'];
+const CURRENCIES = ['PHP'];
 
 export function SettingsSheet({
   state,
@@ -50,21 +51,42 @@ export function SettingsSheet({
   onReset,
 }: Props) {
   const fileRef = useRef<HTMLInputElement>(null);
-  const [paycheckAmount, setPaycheckAmount] = useState(String(state.salary.amountPerPaycheck));
+  const [paychecksLocal, setPaychecksLocal] = useState(
+    state.salary.paychecks.map((p) => ({ ...p, amountStr: String(p.amount) }))
+  );
   const [payDay1, setPayDay1] = useState(String(state.salary.payDay1));
   const [payDay2, setPayDay2] = useState(String(state.salary.payDay2));
 
-  useEffect(() => setPaycheckAmount(String(state.salary.amountPerPaycheck)), [state.salary.amountPerPaycheck]);
+  useEffect(() => {
+    setPaychecksLocal(state.salary.paychecks.map((p) => ({ ...p, amountStr: String(p.amount) })));
+  }, [state.salary.paychecks]);
   useEffect(() => setPayDay1(String(state.salary.payDay1)), [state.salary.payDay1]);
   useEffect(() => setPayDay2(String(state.salary.payDay2)), [state.salary.payDay2]);
 
-  const commitAmount = (value: string) => {
-    const amount = Number(value);
-    if (value.trim() !== '' && Number.isFinite(amount) && amount >= 0) {
-      onSalary({ amountPerPaycheck: amount });
-      return;
-    }
-    setPaycheckAmount(String(state.salary.amountPerPaycheck));
+  const commitPaychecks = (list = paychecksLocal) => {
+    const next = list.map((p) => {
+      const parsed = Number(p.amountStr);
+      return {
+        ...p,
+        amount: (p.amountStr.trim() !== '' && Number.isFinite(parsed) && parsed >= 0) ? parsed : p.amount,
+      };
+    });
+    setPaychecksLocal(next.map((p) => ({ ...p, amountStr: String(p.amount) })));
+    onSalary({ paychecks: next.map(({ id, name, amount }) => ({ id, name, amount })) });
+  };
+
+  const addPaycheck = () => {
+    const newItem = { id: crypto.randomUUID(), name: 'New Paycheck', amount: 0, amountStr: '0' };
+    const nextList = [...paychecksLocal, newItem];
+    setPaychecksLocal(nextList);
+    commitPaychecks(nextList);
+  };
+
+  const removePaycheck = (id: string) => {
+    if (paychecksLocal.length <= 1) return;
+    const nextList = paychecksLocal.filter((p) => p.id !== id);
+    setPaychecksLocal(nextList);
+    commitPaychecks(nextList);
   };
 
   const commitPayDay = (key: 'payDay1' | 'payDay2', value: string) => {
@@ -115,15 +137,51 @@ export function SettingsSheet({
         <div className="mt-6 space-y-6">
           <div className="space-y-3">
             <h4 className="font-display text-sm uppercase tracking-wider text-muted-foreground">Salary</h4>
-            <div>
-              <Label className="text-xs text-muted-foreground">Per paycheck</Label>
-              <Input
-                type="text"
-                value={paycheckAmount}
-                onChange={(e) => setPaycheckAmount(e.target.value)}
-                onBlur={(e) => commitAmount(e.target.value)}
-                className="mt-1 h-11 tabular"
-              />
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <Label className="text-xs text-muted-foreground">Paychecks</Label>
+                <Button variant="ghost" size="sm" onClick={addPaycheck} className="h-7 text-xs px-2">
+                  <Plus className="mr-1 h-3 w-3" /> Add
+                </Button>
+              </div>
+              <div className="space-y-2">
+                {paychecksLocal.map((p, i) => (
+                  <div key={p.id} className="flex items-center gap-2">
+                    <Input
+                      type="text"
+                      value={p.name}
+                      onChange={(e) => {
+                        const next = [...paychecksLocal];
+                        next[i].name = e.target.value;
+                        setPaychecksLocal(next);
+                      }}
+                      onBlur={() => commitPaychecks()}
+                      className="h-11 flex-1"
+                      placeholder="Name"
+                    />
+                    <Input
+                      type="text"
+                      value={p.amountStr}
+                      onChange={(e) => {
+                        const next = [...paychecksLocal];
+                        next[i].amountStr = e.target.value;
+                        setPaychecksLocal(next);
+                      }}
+                      onBlur={() => commitPaychecks()}
+                      className="h-11 w-24 tabular"
+                    />
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-11 w-11 text-muted-foreground hover:text-destructive"
+                      onClick={() => removePaycheck(p.id)}
+                      disabled={paychecksLocal.length <= 1}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
             </div>
             <div>
               <Label className="text-xs text-muted-foreground">Currency</Label>

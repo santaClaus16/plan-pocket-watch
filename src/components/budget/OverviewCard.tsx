@@ -1,13 +1,18 @@
 import { useBudget } from '@/hooks/useBudget';
 import { formatMoney } from '@/lib/budget/calculations';
 import { ProgressBar } from './ProgressBar';
-import { CalendarDays, TrendingUp, Wallet } from 'lucide-react';
+import { CalendarDays, TrendingUp, Wallet, AlertCircle } from 'lucide-react';
 
 type B = ReturnType<typeof useBudget>;
 
 export function OverviewCard({ period, overall, currency }: { period: B['period']; overall: B['overall']; currency: string }) {
   const statusLabel =
     overall.status === 'over' ? 'Over budget' : overall.status === 'warning' ? 'Spending fast' : 'On track';
+
+  const actualFunds = overall.income - overall.spent;
+  const isLackingFunds = overall.remaining > 0 && actualFunds < overall.remaining;
+  const lackingAmount = overall.remaining - actualFunds;
+  const futureBalance = actualFunds - Math.max(0, overall.remaining);
 
   return (
     <section className="surface-card relative overflow-hidden rounded-3xl border border-border p-6 sm:p-8">
@@ -24,8 +29,8 @@ export function OverviewCard({ period, overall, currency }: { period: B['period'
               (overall.status === 'over'
                 ? 'border-destructive/40 bg-destructive/10 text-destructive'
                 : overall.status === 'warning'
-                ? 'border-warning/40 bg-warning/10 text-warning'
-                : 'border-success/40 bg-success/10 text-success')
+                  ? 'border-warning/40 bg-warning/10 text-warning'
+                  : 'border-success/40 bg-success/10 text-success')
             }
           >
             {statusLabel}
@@ -35,9 +40,42 @@ export function OverviewCard({ period, overall, currency }: { period: B['period'
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
           <Stat icon={<Wallet className="h-4 w-4" />} label="Income" value={formatMoney(overall.income, currency)} />
           <Stat icon={<TrendingUp className="h-4 w-4" />} label="Spent" value={formatMoney(overall.spent, currency)} />
-          <Stat label="Remaining" value={formatMoney(Math.max(0, overall.remaining), currency)} accent />
+          <Stat
+            label={overall.remaining < 0 ? "Overspent" : "Remaining"}
+            value={formatMoney(Math.abs(overall.remaining), currency)}
+            accent={overall.remaining >= 0}
+            valueClassName={overall.remaining < 0 ? "text-destructive" : undefined}
+          />
           <Stat icon={<CalendarDays className="h-4 w-4" />} label="Days left" value={`${period.daysRemaining}`} />
         </div>
+
+        {(isLackingFunds || overall.income > 0) && (
+          isLackingFunds ? (
+            <div className="flex items-start gap-2 rounded-xl border border-destructive/20 bg-destructive/10 p-3 text-sm text-destructive">
+              <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
+              <div>
+                <span className="font-semibold">Insufficient funds: </span>
+                {actualFunds < 0 ? (
+                  <>You have already overspent your income by {formatMoney(Math.abs(actualFunds), currency)} and still have {formatMoney(overall.remaining, currency)} in planned expenses.</>
+                ) : (
+                  <>You have {formatMoney(actualFunds, currency)} available, but your remaining budget is {formatMoney(overall.remaining, currency)}. You lack {formatMoney(lackingAmount, currency)} to cover it.</>
+                )}
+              </div>
+            </div>
+          ) : (
+            <div className="flex items-start gap-2 rounded-xl border border-success/20 bg-success/10 p-3 text-sm text-success">
+              <Wallet className="mt-0.5 h-4 w-4 shrink-0" />
+              <div>
+                <span className="font-semibold">Future balance: </span>
+                {futureBalance > 0 ? (
+                  <>If you stick to your budget, you'll have {formatMoney(futureBalance, currency)} left over.</>
+                ) : (
+                  <>Your income exactly covers your budget. You'll have a zero balance.</>
+                )}
+              </div>
+            </div>
+          )
+        )}
 
         <div className="space-y-2">
           <div className="flex items-baseline justify-between text-sm">
@@ -57,14 +95,14 @@ export function OverviewCard({ period, overall, currency }: { period: B['period'
   );
 }
 
-function Stat({ icon, label, value, accent }: { icon?: React.ReactNode; label: string; value: string; accent?: boolean }) {
+function Stat({ icon, label, value, accent, valueClassName }: { icon?: React.ReactNode; label: string; value: string; accent?: boolean; valueClassName?: string }) {
   return (
     <div className="rounded-2xl border border-border/60 bg-secondary/40 p-3">
       <div className="flex items-center gap-1.5 text-[11px] uppercase tracking-wide text-muted-foreground">
         {icon}
         {label}
       </div>
-      <div className={'mt-1 tabular font-display text-lg font-semibold sm:text-xl ' + (accent ? 'text-gradient' : '')}>
+      <div className={`mt-1 tabular font-display text-lg font-semibold sm:text-xl ${accent ? 'text-gradient' : ''} ${valueClassName || ''}`.trim()}>
         {value}
       </div>
     </div>

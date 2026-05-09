@@ -22,10 +22,16 @@ export interface Expense {
   createdAt: string;
 }
 
+export interface Paycheck {
+  id: string;
+  name: string;
+  amount: number;
+}
+
 export type PaySchedule = 'twice-monthly' | 'biweekly';
 
 export interface SalarySettings {
-  amountPerPaycheck: number;
+  paychecks: Paycheck[];
   schedule: PaySchedule;
   anchorDate: string;
   payDay1: number;
