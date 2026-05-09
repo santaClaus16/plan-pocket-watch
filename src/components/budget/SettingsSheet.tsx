@@ -119,7 +119,8 @@ export function SettingsSheet({
                 <div>
                   <Label className="text-xs text-muted-foreground">First pay day</Label>
                   <Input
-                    type="number" min={1} max={28}
+                    type="text"
+                    inputMode="decimal"
                     value={state.salary.payDay1}
                     onChange={(e) => onSalary({ payDay1: Math.min(28, Math.max(1, Number(e.target.value) || 1)) })}
                     className="mt-1 h-11 tabular"
@@ -128,7 +129,8 @@ export function SettingsSheet({
                 <div>
                   <Label className="text-xs text-muted-foreground">Second pay day</Label>
                   <Input
-                    type="number" min={1} max={28}
+                    type="text"
+                    inputMode="decimal"
                     value={state.salary.payDay2}
                     onChange={(e) => onSalary({ payDay2: Math.min(28, Math.max(1, Number(e.target.value) || 1)) })}
                     className="mt-1 h-11 tabular"
