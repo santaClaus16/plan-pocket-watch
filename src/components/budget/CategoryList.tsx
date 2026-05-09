@@ -57,9 +57,8 @@ export function CategoryList({ stats, currency, categoryMap, onBudgetChange }: P
                     </Label>
                     <Input
                       id={`b-${s.category}`}
-                      type="number"
+                      type="text"
                       inputMode="decimal"
-                      min={0}
                       value={s.budget}
                       onChange={(e) => onBudgetChange(s.category, Math.max(0, Number(e.target.value) || 0))}
                       className="mt-1 h-11 tabular"
