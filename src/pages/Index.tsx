@@ -6,6 +6,7 @@ import { ExpenseList } from '@/components/budget/ExpenseList';
 import { SettingsSheet } from '@/components/budget/SettingsSheet';
 import { PaycheckList } from '@/components/budget/PaycheckList';
 import { ThemeToggle } from '@/components/ThemeToggle';
+import { CalculatorWidget } from '@/components/budget/CalculatorWidget';
 
 const Index = () => {
   const b = useBudget();
@@ -24,6 +25,7 @@ const Index = () => {
             </div>
           </div>
           <div className="flex items-center gap-2">
+            <CalculatorWidget />
             <ThemeToggle />
             <SettingsSheet
               state={b.state}

@@ -74,10 +74,9 @@ export function ExpenseForm({ categories, onAdd }: Props) {
                   <Label htmlFor="exp-date" className="text-xs text-muted-foreground">Date</Label>
                   <Input
                     id="exp-date"
-                    type="text"
+                    type="date"
                     value={date}
                     onChange={(e) => setDate(e.target.value)}
-                    placeholder="YYYY-MM-DD"
                     className="h-11"
                   />
                 </TabsContent>
