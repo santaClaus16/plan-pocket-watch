@@ -59,6 +59,7 @@ const Index = () => {
           currency={b.state.salary.currency}
           categoryMap={b.categoryMap}
           onRemove={b.removeExpense}
+          onUpdate={b.updateExpense}
         />
         <p className="pt-2 text-center text-xs text-muted-foreground">
           Saved locally on this device · Export from settings to back up

@@ -7,7 +7,7 @@ type B = ReturnType<typeof useBudget>;
 
 export function OverviewCard({ period, overall, currency }: { period: B['period']; overall: B['overall']; currency: string }) {
   const statusLabel =
-    overall.status === 'over' ? 'Over budget' : overall.status === 'warning' ? 'Spending fast' : 'On track';
+    overall.status === 'over' ? 'Over budget' : overall.status === 'warning' ? 'Spending fast' : overall.status === 'success' ? 'Target met' : 'On track';
 
   const actualFunds = overall.income - overall.spent;
   const isLackingFunds = overall.remaining > 0 && actualFunds < overall.remaining;
@@ -41,9 +41,9 @@ export function OverviewCard({ period, overall, currency }: { period: B['period'
           <Stat icon={<Wallet className="h-4 w-4" />} label="Income" value={formatMoney(overall.income, currency)} />
           <Stat icon={<TrendingUp className="h-4 w-4" />} label="Spent" value={formatMoney(overall.spent, currency)} />
           <Stat
-            // label={overall.remaining < 0 ? "Overspent" : "Remaining"}
+            label={overall.remaining < 0 ? "Overspent" : "Target"}
             icon={<Target className="h-4 w-4" />}
-            label="Target"
+            // label="Target"
             value={formatMoney(Math.abs(overall.remaining), currency)}
             accent={overall.remaining >= 0}
             valueClassName={overall.remaining < 0 ? "text-destructive" : undefined}

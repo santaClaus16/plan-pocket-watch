@@ -26,7 +26,7 @@ export interface CategoryStat {
   budget: number;
   remaining: number;
   progress: number;
-  status: 'safe' | 'warning' | 'over';
+  status: 'safe' | 'warning' | 'over' | 'success';
 }
 
 export function computeCategoryStats(state: BudgetState, period: Period): CategoryStat[] {
@@ -39,7 +39,7 @@ export function computeCategoryStats(state: BudgetState, period: Period): Catego
     const remaining = budget - spent;
     const progress = budget > 0 ? spent / budget : spent > 0 ? 1 : 0;
     const status: CategoryStat['status'] =
-      progress >= 1 ? 'over' : progress >= 0.8 ? 'warning' : 'safe';
+      progress > 1 ? 'over' : progress === 1 ? 'success' : progress >= 0.8 ? 'warning' : 'safe';
     return { category: c.id, spent, budget, remaining, progress, status };
   });
 }
@@ -51,7 +51,7 @@ export interface OverallStat {
   remaining: number;
   progress: number;
   pace: number;
-  status: 'safe' | 'warning' | 'over';
+  status: 'safe' | 'warning' | 'over' | 'success';
 }
 
 export function computeOverall(state: BudgetState, period: Period): OverallStat {
@@ -66,6 +66,6 @@ export function computeOverall(state: BudgetState, period: Period): OverallStat 
   const progress = budgetTotal > 0 ? spent / budgetTotal : 0;
   const pace = period.progress;
   const status: OverallStat['status'] =
-    progress >= 1 ? 'over' : progress > pace + 0.1 ? 'warning' : 'safe';
+    progress > 1 ? 'over' : progress === 1 ? 'success' : progress > pace + 0.1 ? 'warning' : 'safe';
   return { income, budgetTotal, spent, remaining, progress, pace, status };
 }

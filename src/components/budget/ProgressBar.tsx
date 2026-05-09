@@ -3,7 +3,7 @@ import { cn } from '@/lib/utils';
 interface Props {
   value: number; // 0..1+
   pace?: number; // 0..1 expected progress marker
-  status?: 'safe' | 'warning' | 'over';
+  status?: 'safe' | 'warning' | 'over' | 'success';
   className?: string;
   height?: number;
 }
@@ -12,6 +12,7 @@ const colors: Record<NonNullable<Props['status']>, string> = {
   safe: 'bg-gradient-to-r from-primary to-primary-glow',
   warning: 'bg-gradient-to-r from-warning to-[hsl(20_95%_60%)]',
   over: 'bg-gradient-to-r from-destructive to-[hsl(340_85%_60%)]',
+  success: 'bg-gradient-to-r from-success to-[hsl(150_65%_45%)]',
 };
 
 export function ProgressBar({ value, pace, status = 'safe', className, height = 10 }: Props) {

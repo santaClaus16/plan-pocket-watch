@@ -71,6 +71,13 @@ export function useBudget() {
     setState((p) => ({ ...p, expenses: p.expenses.filter((e) => e.id !== id) }));
   }, []);
 
+  const updateExpense = useCallback((id: string, patch: Partial<Omit<Expense, 'id' | 'createdAt'>>) => {
+    setState((p) => ({
+      ...p,
+      expenses: p.expenses.map((e) => (e.id === id ? { ...e, ...patch } : e)),
+    }));
+  }, []);
+
   const addCategory = useCallback((label: string, emoji: string, budget = 0) => {
     const id = crypto.randomUUID();
     const cat: Category = { id, label: label.trim(), emoji: emoji.trim() || '📌' };
@@ -130,6 +137,7 @@ export function useBudget() {
     setCategoryBudget,
     addExpense,
     removeExpense,
+    updateExpense,
     addCategory,
     updateCategory,
     removeCategory,
