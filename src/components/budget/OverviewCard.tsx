@@ -1,7 +1,7 @@
 import { useBudget } from '@/hooks/useBudget';
 import { formatMoney } from '@/lib/budget/calculations';
 import { ProgressBar } from './ProgressBar';
-import { CalendarDays, TrendingUp, Wallet, AlertCircle } from 'lucide-react';
+import { CalendarDays, TrendingUp, Wallet, AlertCircle, Target } from 'lucide-react';
 
 type B = ReturnType<typeof useBudget>;
 
@@ -41,7 +41,9 @@ export function OverviewCard({ period, overall, currency }: { period: B['period'
           <Stat icon={<Wallet className="h-4 w-4" />} label="Income" value={formatMoney(overall.income, currency)} />
           <Stat icon={<TrendingUp className="h-4 w-4" />} label="Spent" value={formatMoney(overall.spent, currency)} />
           <Stat
-            label={overall.remaining < 0 ? "Overspent" : "Remaining"}
+            // label={overall.remaining < 0 ? "Overspent" : "Remaining"}
+            icon={<Target className="h-4 w-4" />}
+            label="Target"
             value={formatMoney(Math.abs(overall.remaining), currency)}
             accent={overall.remaining >= 0}
             valueClassName={overall.remaining < 0 ? "text-destructive" : undefined}
