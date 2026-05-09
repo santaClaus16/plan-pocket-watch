@@ -61,7 +61,14 @@ export function ExpenseForm({ categories, onAdd }: Props) {
           </TabsList>
           <TabsContent value="one-time" className="mt-4 space-y-1">
             <Label htmlFor="exp-date" className="text-xs text-muted-foreground">Date</Label>
-            <Input id="exp-date" type="date" value={date} onChange={(e) => setDate(e.target.value)} className="h-11" />
+            <Input
+              id="exp-date"
+              type="text"
+              value={date}
+              onChange={(e) => setDate(e.target.value)}
+              placeholder="YYYY-MM-DD"
+              className="h-11"
+            />
           </TabsContent>
           <TabsContent value="recurring" className="mt-4 text-xs text-muted-foreground">
             Counts toward every pay period until removed.
@@ -85,7 +92,6 @@ export function ExpenseForm({ categories, onAdd }: Props) {
             <Input
               id="exp-amt"
               type="text"
-              inputMode="decimal"
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
               placeholder="0.00"
