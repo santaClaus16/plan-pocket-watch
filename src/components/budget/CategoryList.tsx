@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { Category, CategoryId, UNKNOWN_CATEGORY } from '@/lib/budget/types';
 import { CategoryStat, formatMoney } from '@/lib/budget/calculations';
 import { ProgressBar } from './ProgressBar';
@@ -18,6 +19,26 @@ interface Props {
 }
 
 export function CategoryList({ stats, currency, categoryMap, onBudgetChange }: Props) {
+  const [draftBudgets, setDraftBudgets] = useState<Record<CategoryId, string>>({});
+
+  useEffect(() => {
+    setDraftBudgets(
+      stats.reduce(
+        (acc, s) => ({ ...acc, [s.category]: String(s.budget) }),
+        {} as Record<CategoryId, string>,
+      ),
+    );
+  }, [stats]);
+
+  const commitBudget = (category: CategoryId, value: string, fallback: number) => {
+    const budget = Number(value);
+    if (value.trim() !== '' && Number.isFinite(budget) && budget >= 0) {
+      onBudgetChange(category, budget);
+      return;
+    }
+    setDraftBudgets((current) => ({ ...current, [category]: String(fallback) }));
+  };
+
   return (
     <section className="surface-card rounded-3xl border border-border p-4 sm:p-6">
       <header className="mb-3 flex items-baseline justify-between">
@@ -58,9 +79,9 @@ export function CategoryList({ stats, currency, categoryMap, onBudgetChange }: P
                     <Input
                       id={`b-${s.category}`}
                       type="text"
-                      inputMode="decimal"
-                      value={s.budget}
-                      onChange={(e) => onBudgetChange(s.category, Math.max(0, Number(e.target.value) || 0))}
+                      value={draftBudgets[s.category] ?? String(s.budget)}
+                      onChange={(e) => setDraftBudgets((current) => ({ ...current, [s.category]: e.target.value }))}
+                      onBlur={(e) => commitBudget(s.category, e.target.value, s.budget)}
                       className="mt-1 h-11 tabular"
                     />
                   </div>
